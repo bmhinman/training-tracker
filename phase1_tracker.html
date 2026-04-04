@@ -594,7 +594,7 @@ function initLog() {
 }
 
 async function fetchFromSheets() {
-  if (API_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+  if (API_URL === 'https://script.google.com/macros/s/AKfycbzCrhXhlQnGnWJZ_QHCAPLYoSW-4h-3fVamS-XOZzOMITOzjqhRhosvLTZF8D0Io9o4CQ/exec') return;
   try {
     const res = await fetch(API_URL + '?action=getAll');
     const data = await res.json();
@@ -613,7 +613,7 @@ async function fetchFromSheets() {
 
 async function saveLog(logData) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(logData));
-  if (API_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+  if (API_URL === 'https://script.google.com/macros/s/AKfycbzCrhXhlQnGnWJZ_QHCAPLYoSW-4h-3fVamS-XOZzOMITOzjqhRhosvLTZF8D0Io9o4CQ/exec') return;
   try {
     await fetch(API_URL, {
       method: 'POST',
@@ -627,7 +627,7 @@ async function saveLog(logData) {
 async function deleteEntry(dateStr) {
   delete log[dateStr];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
-  if (API_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+  if (API_URL === 'https://script.google.com/macros/s/AKfycbzCrhXhlQnGnWJZ_QHCAPLYoSW-4h-3fVamS-XOZzOMITOzjqhRhosvLTZF8D0Io9o4CQ/exec') return;
   try {
     await fetch(API_URL, {
       method: 'POST',
