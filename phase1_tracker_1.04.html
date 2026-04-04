@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Phase 1 · Training Log</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F2ED;
+    --card: #FFFFFF;
+    --ink: #1A1A18;
+    --ink-soft: #6B6860;
+    --ink-muted: #A8A49E;
+    --accent: #2D5A8E;
+    --accent-light: #EBF1F8;
+    --green: #2D7A4F;
+    --green-light: #EBF5F0;
+    --amber: #B86E00;
+    --amber-light: #FFF4E0;
+    --red: #C0392B;
+    --red-light: #FDECEA;
+    --border: #E4E0D8;
+    --radius: 14px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* ── HEADER ── */
+  .app-header {
+    background: var(--accent);
+    color: white;
+    padding: 20px 20px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(45,90,142,0.3);
+  }
+  .app-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    letter-spacing: -0.3px;
+    margin-bottom: 2px;
+  }
+  .app-header p {
+    font-size: 13px;
+    opacity: 0.75;
+    font-weight: 300;
+  }
+
+  /* ── NAV TABS ── */
+  .nav-tabs {
+    display: flex;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: sticky;
+    top: 68px;
+    z-index: 99;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex: none;
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* ── MAIN ── */
+  .main { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+  /* ── TODAY CARD ── */
+  .today-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .today-card-header {
+    background: var(--accent);
+    color: white;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .today-card-header .date-label {
+    font-size: 11px;
+    opacity: 0.75;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 500;
+  }
+  .today-card-header .day-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    margin-top: 2px;
+  }
+  .workout-badge {
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+  }
+  .today-card-body { padding: 18px; }
+  .workout-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 19px;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  .workout-desc {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 14px;
+  }
+  .workout-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .tag {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+  .tag-hr { background: var(--accent-light); color: var(--accent); }
+  .tag-type { background: var(--green-light); color: var(--green); }
+  .tag-note { background: var(--amber-light); color: var(--amber); }
+
+  /* ── LOG FORM ── */
+  .log-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--ink-muted);
+    margin-bottom: 12px;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .form-row.single { grid-template-columns: 1fr; }
+  .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--accent);
+  }
+  .field textarea { resize: none; height: 80px; font-size: 14px; line-height: 1.5; }
+
+  /* RPE slider */
+  .rpe-track {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .rpe-track input[type=range] {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 0;
+    accent-color: var(--accent);
+    height: 4px;
+  }
+  .rpe-val {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent);
+    min-width: 24px;
+    text-align: right;
+  }
+
+  /* Zone time inputs */
+  .zone-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  /* Save button */
+  .save-btn {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.2px;
+  }
+  .save-btn:active { transform: scale(0.98); background: #234a73; }
+
+  .skip-btn {
+    width: 100%;
+    background: none;
+    color: var(--ink-muted);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 13px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  /* ── SAVED INDICATOR ── */
+  .saved-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--green-light);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  /* ── WEEK VIEW ── */
+  .week-section { margin-bottom: 20px; }
+  .week-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--ink-muted);
+    margin-bottom: 10px;
+    padding-left: 2px;
+  }
+  .week-grid { display: flex; flex-direction: column; gap: 8px; }
+  .day-row {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 13px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: transform 0.1s;
+    border: 1.5px solid transparent;
+  }
+  .day-row:active { transform: scale(0.99); }
+  .day-row.is-today { border-color: var(--accent); }
+  .day-row.is-logged { border-color: var(--green); }
+  .day-row.is-skipped { opacity: 0.5; }
+  .day-row.is-future { opacity: 0.7; }
+  .day-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .dot-rest { background: var(--border); color: var(--ink-muted); }
+  .dot-ride { background: var(--accent-light); color: var(--accent); }
+  .dot-strength { background: #EEF0FB; color: #3D5A9E; }
+  .dot-yoga { background: #F5EEF8; color: #8E44AD; }
+  .dot-logged { background: var(--green-light); color: var(--green); }
+  .dot-skipped { background: var(--border); color: var(--ink-muted); }
+  .day-info { flex: 1; min-width: 0; }
+  .day-info .di-date { font-size: 11px; color: var(--ink-muted); margin-bottom: 2px; }
+  .day-info .di-workout { font-size: 14px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .day-info .di-logged { font-size: 12px; color: var(--green); margin-top: 2px; }
+  .day-chevron { color: var(--ink-muted); font-size: 16px; }
+
+  /* ── STATS TAB ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .stat-card .sc-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-card .sc-label {
+    font-size: 12px;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+  .progress-bar-wrap {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    margin-bottom: 10px;
+  }
+  .pb-label { font-size: 13px; font-weight: 500; color: var(--ink-soft); margin-bottom: 10px; display: flex; justify-content: space-between; }
+  .pb-track {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .pb-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  .pb-fill.green { background: var(--green); }
+
+  /* ── DETAIL VIEW ── */
+  .detail-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 200;
+    display: none;
+    align-items: flex-end;
+  }
+  .detail-overlay.open { display: flex; }
+  .detail-sheet {
+    background: var(--card);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .detail-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 18px;
+  }
+  .detail-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: var(--bg);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 999;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  /* Vancouver notice */
+  .notice-card {
+    background: var(--amber-light);
+    border: 1.5px solid #F0C070;
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--amber);
+    line-height: 1.5;
+  }
+  .notice-card strong { display: block; margin-bottom: 3px; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>Phase 1 · Base Building</h1>
+  <p id="headerSub">Apr 4 – May 29, 2026 · 56 days</p>
+</div>
+
+<div class="nav-tabs">
+  <button class="tab-btn active" onclick="showTab('today')">Today</button>
+  <button class="tab-btn" onclick="showTab('schedule')">Schedule</button>
+  <button class="tab-btn" onclick="showTab('stats')">Stats</button>
+</div>
+
+<div class="main">
+
+  <!-- ── TODAY TAB ── -->
+  <div id="tab-today">
+    <div id="todayCardWrap"></div>
+  </div>
+
+  <!-- ── SCHEDULE TAB ── -->
+  <div id="tab-schedule" style="display:none">
+    <div id="scheduleWrap"></div>
+  </div>
+
+  <!-- ── STATS TAB ── -->
+  <div id="tab-stats" style="display:none">
+    <div id="statsWrap"></div>
+  </div>
+
+</div>
+
+<!-- ── DETAIL SHEET ── -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+  <div class="detail-sheet" id="detailSheet">
+    <div class="detail-handle"></div>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+
+const PHASE1 = [
+  // Pre-week (Apr 4–5): Saturday finish your 10-week program, Sunday rest
+  {date:'2026-04-04',day:'Saturday',type:'Ride C',label:'Phase 1 Begins — Easy Ride',desc:'60 min Z2 steady. Cadence ~90 rpm. Conversational pace. First ride of Phase 1 — start conservative. Full weekly structure begins Monday.',hr:'Z2 125–135',tags:['ride','z2'],week:'pre'},
+  {date:'2026-04-05',day:'Sunday',type:'Rest',label:'Rest or Light Yoga',desc:'True recovery day. Walk or 20–30 min easy yoga if desired. Week 1 begins tomorrow.',hr:'',tags:['rest'],week:'pre'},
+
+  // Week 1 (Mon Apr 6 – Sun Apr 12)
+  {date:'2026-04-06',day:'Monday',type:'Strength',label:'Full Body Strength',desc:'50–60 min. Upper body focus. Begin cable/band lateral raises very light (15–20 reps). Rows, pull-downs, pressing.',hr:'',tags:['strength'],week:1},
+  {date:'2026-04-07',day:'Tuesday',type:'Ride A',label:'Z2 Steady Ride',desc:'50–65 min Z2. HR 125–139 (Morpheus-adjusted). Cadence ~90 rpm.',hr:'Z2 125–135',tags:['ride','z2'],week:1},
+  {date:'2026-04-08',day:'Wednesday',type:'Yoga',label:'Yoga / Mobility',desc:'30–45 min. Full flexibility session. Forearm and elbow stretching mandatory.',hr:'',tags:['yoga'],week:1},
+  {date:'2026-04-09',day:'Thursday',type:'Ride B',label:'Z2 + Z3 Touch',desc:'50–60 min. 45 min Z2, final 10–15 min upper Z2 / low Z3 (~140–150 bpm).',hr:'Z2 125–135, Z3 touch 140–150',tags:['ride','z2','z3'],week:1},
+  {date:'2026-04-10',day:'Friday',type:'Strength',label:'Posterior Chain + Core',desc:'45–55 min. Hip hinges, single-leg work, rows, core stability. Light elbow load.',hr:'',tags:['strength'],week:1},
+  {date:'2026-04-11',day:'Saturday',type:'Ride C',label:'Long Steady Ride',desc:'70 min Z2. First long ride of the weekly structure. Keep HR controlled throughout.',hr:'Z2 125–135',tags:['ride','z2'],week:1},
+  {date:'2026-04-12',day:'Sunday',type:'Rest',label:'Rest or Light Yoga',desc:'Full recovery. Walk optional.',hr:'',tags:['rest'],week:1},
+
+  // Week 2 (Mon Apr 13 – Sun Apr 19)
+  {date:'2026-04-13',day:'Monday',type:'Strength',label:'Full Body Strength',desc:'50–60 min. Upper body focus. Progress cable lateral raises — same weight, aim for smoother reps.',hr:'',tags:['strength'],week:2},
+  {date:'2026-04-14',day:'Tuesday',type:'Ride A',label:'Z2 Steady Ride',desc:'55–65 min Z2. HR 125–135. Let effort guide you more than the clock.',hr:'Z2 125–135',tags:['ride','z2'],week:2},
+  {date:'2026-04-15',day:'Wednesday',type:'Yoga',label:'Yoga / Mobility',desc:'30–45 min. Full session. Forearm and shoulder care.',hr:'',tags:['yoga'],week:2},
+  {date:'2026-04-16',day:'Thursday',type:'Ride B',label:'Z2 + Z3 Touch',desc:'50–60 min. 40 min Z2, final 15 min upper Z2 / low Z3.',hr:'Z2 125–135, Z3 touch 140–150',tags:['ride','z2','z3'],week:2},
+  {date:'2026-04-17',day:'Friday',type:'Strength',label:'Posterior Chain + Core',desc:'45–55 min. Hip hinges, deadlifts, single-leg, core.',hr:'',tags:['strength'],week:2},
+  {date:'2026-04-18',day:'Saturday',type:'Ride C',label:'Long Steady Ride',desc:'80 min Z2. Longest ride so far. Focus on keeping HR in Z2 even when effort feels easy.',hr:'Z2 125–135',tags:['ride','z2'],week:2},
+  {date:'2026-04-19',day:'Sunday',type:'Rest',label:'Rest or Light Yoga',desc:'Full recovery.',hr:'',tags:['rest'],week:2},
+
+  // Week 3 (Mon Apr 20 – Sun Apr 26)
+  {date:'2026-04-20',day:'Monday',type:'Strength',label:'Full Body Strength',desc:'55–60 min. Try light dumbbell lateral raises if cable work has been comfortable. Rows, press, pull-downs.',hr:'',tags:['strength'],week:3},
+  {date:'2026-04-21',day:'Tuesday',type:'Ride A',label:'Z2 Steady Ride',desc:'55–65 min Z2. Morpheus-adjusted HR target.',hr:'Z2 125–135',tags:['ride','z2'],week:3},
+  {date:'2026-04-22',day:'Wednesday',type:'Yoga',label:'Yoga / Mobility',desc:'30–45 min. Elbow and shoulder care mandatory.',hr:'',tags:['yoga'],week:3},
+  {date:'2026-04-23',day:'Thursday',type:'Ride B',label:'Z2 + Z3 Touch',desc:'55–60 min. 40 min Z2, 15–20 min upper Z2 / low Z3.',hr:'Z2 125–135, Z3 touch 140–150',tags:['ride','z2','z3'],week:3},
+  {date:'2026-04-24',day:'Friday',type:'Strength',label:'Posterior Chain + Core',desc:'45–55 min. Increase load slightly on main lifts if recovery allows.',hr:'',tags:['strength'],week:3},
+  {date:'2026-04-25',day:'Saturday',type:'Ride C',label:'Long Steady Ride',desc:'90 min Z2. Target duration for end of pre-Vancouver block. Keep it steady and controlled.',hr:'Z2 125–135',tags:['ride','z2'],week:3},
+  {date:'2026-04-26',day:'Sunday',type:'Rest',label:'Rest or Light Yoga',desc:'Full recovery before final week before Vancouver.',hr:'',tags:['rest'],week:3},
+
+  // Week 4 (Mon Apr 27 – Wed Apr 29, then Vancouver begins)
+  {date:'2026-04-27',day:'Monday',type:'Strength',label:'Full Body Strength',desc:'50–55 min. Moderate load — tapering slightly before travel.',hr:'',tags:['strength'],week:4},
+  {date:'2026-04-28',day:'Tuesday',type:'Ride A',label:'Z2 Steady Ride',desc:'50–55 min Z2. Easy and controlled. Save energy for Vancouver.',hr:'Z2 125–135',tags:['ride','z2'],week:4},
+  {date:'2026-04-29',day:'Wednesday',type:'Yoga',label:'Yoga / Mobility',desc:'30–40 min. Pack in flexibility work before travel.',hr:'',tags:['yoga'],week:4},
+
+  // Vancouver block (Week 4 continued + Week 5)
+  {date:'2026-04-30',day:'Thursday',type:'Travel',label:'Travel + Yoga',desc:'Morning flight to Vancouver. Evening yoga on arrival at hotel. 30–45 min. Decompress after travel.',hr:'',tags:['yoga'],notice:'vancouver',week:4},
+  {date:'2026-05-01',day:'Friday',type:'Light',label:'Short Walk or Stretch',desc:'Long rehearsal day begins 10 AM. Light movement only — 20–30 min walk or gentle stretch.',hr:'',tags:['rest'],notice:'vancouver',week:4},
+  {date:'2026-05-02',day:'Saturday',type:'Strength',label:'Upper Body — Hotel Gym',desc:'40–50 min. Machines + free weights. Skip heavy leg work. Cable lateral raises if available.',hr:'',tags:['strength'],notice:'vancouver',week:4},
+  {date:'2026-05-03',day:'Sunday',type:'Cardio',label:'Treadmill or Stationary Bike',desc:'40–50 min steady aerobic. HR 125–135. Arc trainer is a good cycling substitute.',hr:'Z2 125–135',tags:['ride'],notice:'vancouver',week:4},
+  {date:'2026-05-04',day:'Monday',type:'Yoga',label:'Yoga / Mobility',desc:'30 min. Recovery and flexibility. Hotel room is fine.',hr:'',tags:['yoga'],notice:'vancouver',week:5},
+  {date:'2026-05-05',day:'Tuesday',type:'Strength',label:'Full Body Light',desc:'45 min. Moderate load. Lateral delt cable work if available.',hr:'',tags:['strength'],notice:'vancouver',week:5},
+  {date:'2026-05-06',day:'Wednesday',type:'Cardio',label:'Treadmill or Arc Trainer',desc:'45–55 min steady aerobic. Arc trainer is a great cycling substitute for Z2 work.',hr:'Z2 125–135',tags:['ride'],notice:'vancouver',week:5},
+  {date:'2026-05-07',day:'Thursday',type:'Flex',label:'Strength or Yoga',desc:'Choice based on your fatigue. Trust how you feel after the week of rehearsals.',hr:'',tags:['rest'],notice:'vancouver',week:5},
+  {date:'2026-05-08',day:'Friday',type:'Rest',label:'Rest — Long Performance Day',desc:'Long recording + concert day. Full rest. Protect your voice and energy.',hr:'',tags:['rest'],notice:'vancouver',week:5},
+  {date:'2026-05-09',day:'Saturday',type:'Rest',label:'Rest — Concert + Social',desc:'Morning rehearsal + afternoon concert + social evening. Full rest from exercise.',hr:'',tags:['rest'],notice:'vancouver',week:5},
+  {date:'2026-05-10',day:'Sunday',type:'Light',label:'Light Walk Before Flight',desc:'20–30 min easy movement before your flight home. Keep it very easy.',hr:'',tags:['rest'],notice:'vancouver',week:5},
+
+  // Post-Vancouver deload (Week 6)
+  {date:'2026-05-11',day:'Monday',type:'Rest',label:'Travel Recovery',desc:'Home from Vancouver. Rest day. Unpack, decompress.',hr:'',tags:['rest'],notice:'deload',week:6},
+  {date:'2026-05-12',day:'Tuesday',type:'Light',label:'Short Z2 Ride or Walk',desc:'30–40 min easy. Late Chanticleer rehearsal tonight — keep energy for the evening.',hr:'Z2 125–135',tags:['ride'],notice:'deload',week:6},
+  {date:'2026-05-13',day:'Wednesday',type:'Strength',label:'Light Strength Session',desc:'One light strength session for the week. Moderate load, no maximal efforts.',hr:'',tags:['strength'],notice:'deload',week:6},
+  {date:'2026-05-14',day:'Thursday',type:'Yoga',label:'Yoga / Mobility',desc:'30–40 min. Late Chanticleer rehearsal tonight.',hr:'',tags:['yoga'],notice:'deload',week:6},
+  {date:'2026-05-15',day:'Friday',type:'Light',label:'Short Z2 Ride or Walk',desc:'30–40 min easy. Tomorrow is the Santa Clara gig.',hr:'Z2 125–135',tags:['ride'],notice:'deload',week:6},
+  {date:'2026-05-16',day:'Saturday',type:'Rest',label:'Rest — Santa Clara Concert',desc:'Evening performance with Santa Clara Chorale (Haydn\'s Creation). Rest and prepare.',hr:'',tags:['rest'],notice:'deload',week:6},
+  {date:'2026-05-17',day:'Sunday',type:'Rest',label:'Rest',desc:'Full recovery after the concert week.',hr:'',tags:['rest'],notice:'deload',week:6},
+
+  // Resume training (Week 7)
+  {date:'2026-05-18',day:'Monday',type:'Strength',label:'Full Body Strength — Resume',desc:'55–60 min. Full session resuming. Upper body focus. Back to normal load.',hr:'',tags:['strength'],week:7},
+  {date:'2026-05-19',day:'Tuesday',type:'Ride A',label:'Z2 Steady Ride',desc:'55–65 min Z2. First full ride back. Let HR guide you — don\'t force it.',hr:'Z2 125–135',tags:['ride','z2'],week:7},
+  {date:'2026-05-20',day:'Wednesday',type:'Yoga',label:'Yoga / Mobility',desc:'30–45 min.',hr:'',tags:['yoga'],week:7},
+  {date:'2026-05-21',day:'Thursday',type:'Ride B',label:'Z2 + Z3 Touch',desc:'55–60 min. 40 min Z2, final 15–20 min upper Z2 / low Z3.',hr:'Z2 125–135, Z3 touch 140–150',tags:['ride','z2','z3'],week:7},
+  {date:'2026-05-22',day:'Friday',type:'Strength',label:'Posterior Chain + Core',desc:'45–55 min.',hr:'',tags:['strength'],week:7},
+  {date:'2026-05-23',day:'Saturday',type:'Ride C',label:'Long Steady Ride',desc:'85–90 min Z2. Back to pre-Vancouver duration. Keep HR controlled.',hr:'Z2 125–135',tags:['ride','z2'],week:7},
+  {date:'2026-05-24',day:'Sunday',type:'Rest',label:'Rest or Light Yoga',desc:'Full recovery.',hr:'',tags:['rest'],week:7},
+
+  // Final week (Week 8)
+  {date:'2026-05-25',day:'Monday',type:'Strength',label:'Full Body Strength',desc:'55–60 min. Final strength session of Phase 1. Upper body focus.',hr:'',tags:['strength'],week:8},
+  {date:'2026-05-26',day:'Tuesday',type:'Ride A',label:'Z2 Steady Ride',desc:'60 min Z2. Solid, controlled effort.',hr:'Z2 125–135',tags:['ride','z2'],week:8},
+  {date:'2026-05-27',day:'Wednesday',type:'Yoga',label:'Yoga / Mobility',desc:'30–45 min. Phase 1 is almost done — celebrate your consistency.',hr:'',tags:['yoga'],week:8},
+  {date:'2026-05-28',day:'Thursday',type:'Ride B',label:'Z2 + Z3 Touch',desc:'Final Ride B of Phase 1. 40 min Z2, 20 min upper Z2 / low Z3.',hr:'Z2 125–135, Z3 touch 140–150',tags:['ride','z2','z3'],week:8},
+  {date:'2026-05-29',day:'Friday',type:'Strength',label:'Phase 1 Final Session',desc:'45–55 min. Posterior chain + core. You made it through Phase 1.',hr:'',tags:['strength'],week:8},
+];
+
+// ── GOOGLE SHEETS SYNC ───────────────────────────────────────────────
+// Replace the URL below with your deployed Apps Script URL (Step 2 of setup)
+const API_URL = 'https://script.google.com/macros/s/AKfycbzCrhXhlQnGnWJZ_QHCAPLYoSW-4h-3fVamS-XOZzOMITOzjqhRhosvLTZF8D0Io9o4CQ/exec';
+
+const STORAGE_KEY = 'phase1_log_v1';
+let log = {};
+
+// Load from localStorage immediately (instant), then sync from Sheets
+function initLog() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    log = normalizeLog(raw);
+  } catch { log = {}; }
+  renderToday();
+  fetchFromSheets();
+}
+
+async function fetchFromSheets() {
+  if (API_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    console.log('API_URL not set — skipping fetch');
+    return;
+  }
+  console.log('Fetching from Sheets…', API_URL);
+  try {
+    const res = await fetch(API_URL + '?action=getAll');
+    console.log('Response status:', res.status);
+    const text = await res.text();
+    console.log('Raw response:', text);
+    const data = JSON.parse(text);
+    if (data && data.log) {
+      log = normalizeLog(data.log);
+      console.log('Log loaded from Sheets:', log);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
+      renderToday();
+      const activeTab = document.querySelector('.tab-btn.active')?.textContent?.toLowerCase();
+      if (activeTab === 'schedule') renderSchedule();
+      if (activeTab === 'stats') renderStats();
+    } else {
+      console.log('No log data in response:', data);
+    }
+  } catch(e) {
+    console.log('Fetch error:', e.message, e);
+  }
+}
+
+async function saveLog(logData) {
+  const clean = normalizeLog(logData);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(clean));
+  if (API_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+  try {
+    await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'saveAll', log: clean })
+    });
+  } catch(e) {
+    console.log('Sheets save failed, data saved locally');
+  }
+}
+
+async function deleteEntry(dateStr) {
+  delete log[dateStr];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
+  if (API_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+  try {
+    await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'delete', date: dateStr })
+    });
+  } catch(e) {}
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────
+
+function todayStr() {
+  const d = new Date();
+  const yr = d.getFullYear();
+  const mo = String(d.getMonth()+1).padStart(2,'0');
+  const dy = String(d.getDate()).padStart(2,'0');
+  return `${yr}-${mo}-${dy}`;
+}
+
+// Normalize any date key to YYYY-MM-DD format
+// Handles both '2026-04-04' and full date strings like 'Sat Apr 04 2026...'
+function normalizeDate(dateStr) {
+  if (!dateStr) return null;
+  // Already in correct format
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  // Parse the full date string and reformat
+  const d = new Date(dateStr);
+  if (isNaN(d)) return null;
+  const yr = d.getFullYear();
+  const mo = String(d.getMonth()+1).padStart(2,'0');
+  const dy = String(d.getDate()).padStart(2,'0');
+  return `${yr}-${mo}-${dy}`;
+}
+
+// Normalize all keys in the log after loading
+function normalizeLog(rawLog) {
+  const clean = {};
+  for (const key in rawLog) {
+    const normalized = normalizeDate(key);
+    if (normalized) clean[normalized] = rawLog[key];
+  }
+  return clean;
+}
+
+function fmtDate(str) {
+  const [y,m,d] = str.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  return dt.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+}
+
+function typeIcon(type) {
+  if (!type) return '·';
+  const t = type.toLowerCase();
+  if (t.includes('ride') || t.includes('cardio')) return '🚴';
+  if (t.includes('strength')) return '💪';
+  if (t.includes('yoga')) return '🧘';
+  if (t.includes('rest') || t.includes('travel')) return '😴';
+  if (t.includes('light') || t.includes('flex')) return '🚶';
+  return '·';
+}
+
+function dotClass(entry, dateStr, isLogged, isSkipped) {
+  if (isLogged) return 'dot-logged';
+  if (isSkipped) return 'dot-skipped';
+  const t = (entry.type||'').toLowerCase();
+  if (t.includes('ride') || t.includes('cardio')) return 'dot-ride';
+  if (t.includes('strength')) return 'dot-strength';
+  if (t.includes('yoga')) return 'dot-yoga';
+  return 'dot-rest';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function isFuture(dateStr) {
+  return dateStr > todayStr();
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────
+
+function showTab(name) {
+  ['today','schedule','stats'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===name ? '' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['today','schedule','stats'][i]===name);
+  });
+  if (name==='schedule') renderSchedule();
+  if (name==='stats') renderStats();
+}
+
+// ── TODAY TAB ─────────────────────────────────────────────────────────
+
+function renderToday() {
+  const today = todayStr();
+  const entry = PHASE1.find(e => e.date === today);
+  const wrap = document.getElementById('todayCardWrap');
+
+  if (!entry) {
+    const inPhase = today >= '2026-04-04' && today <= '2026-05-29';
+    wrap.innerHTML = `<div class="today-card"><div class="today-card-body" style="text-align:center;padding:40px 20px">
+      <div style="font-size:48px;margin-bottom:12px">${inPhase ? '✅' : '📅'}</div>
+      <div class="workout-title">${inPhase ? 'Phase 1 Complete!' : 'Phase 1 starts April 4, 2026'}</div>
+      <p class="workout-desc" style="margin-top:8px">${inPhase ? 'All 56 days are behind you. Phase 2 begins June 2.' : 'Check back on April 4th.'}</p>
+    </div></div>`;
+    return;
+  }
+
+  const logged = log[today];
+  const badgeText = entry.type;
+  const icon = typeIcon(entry.type);
+  const noticeHtml = entry.notice === 'vancouver'
+    ? `<div class="notice-card"><strong>🎵 Vancouver — Leonids Tour</strong>Training is secondary this week. Sing well, rest well.</div>`
+    : entry.notice === 'deload'
+    ? `<div class="notice-card"><strong>↩️ Post-Tour Deload Week</strong>Light load only. Chanticleer responsibilities this week.</div>`
+    : '';
+
+  if (logged && logged.status === 'logged') {
+    wrap.innerHTML = `
+      ${noticeHtml}
+      <div class="today-card">
+        <div class="today-card-header">
+          <div><div class="date-label">${entry.day}, ${fmtDate(entry.date)}</div><div class="day-name">${entry.label}</div></div>
+          <div class="workout-badge">${badgeText}</div>
+        </div>
+        <div class="today-card-body">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <span class="saved-pill">✓ Logged</span>
+            <span style="font-size:13px;color:var(--ink-muted)">Avg HR ${logged.avgHr||'—'} · Max ${logged.maxHr||'—'} · RPE ${logged.rpe||'—'}</span>
+          </div>
+          ${logged.notes ? `<p style="font-size:14px;color:var(--ink-soft);line-height:1.5;margin-bottom:16px">"${logged.notes}"</p>` : ''}
+          <button class="skip-btn" onclick="clearLog('${today}')">Edit / Clear this entry</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  if (logged && logged.status === 'skipped') {
+    wrap.innerHTML = `
+      ${noticeHtml}
+      <div class="today-card">
+        <div class="today-card-header" style="background:var(--ink-soft)">
+          <div><div class="date-label">${entry.day}, ${fmtDate(entry.date)}</div><div class="day-name">${entry.label}</div></div>
+          <div class="workout-badge">Skipped</div>
+        </div>
+        <div class="today-card-body">
+          <p style="font-size:14px;color:var(--ink-soft);margin-bottom:16px">Marked as skipped. That's okay.</p>
+          <button class="skip-btn" onclick="clearLog('${today}')">Undo skip</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const isRest = ['rest','travel'].some(x => (entry.type||'').toLowerCase().includes(x));
+  const isRide = ['ride','cardio'].some(x => (entry.type||'').toLowerCase().includes(x));
+  const isStrength = (entry.type||'').toLowerCase().includes('strength');
+
+  wrap.innerHTML = `
+    ${noticeHtml}
+    <div class="today-card">
+      <div class="today-card-header">
+        <div>
+          <div class="date-label">${entry.day}, ${fmtDate(entry.date)}</div>
+          <div class="day-name">${icon} ${entry.label}</div>
+        </div>
+        <div class="workout-badge">${badgeText}</div>
+      </div>
+      <div class="today-card-body">
+        <p class="workout-desc">${entry.desc}</p>
+        ${entry.hr ? `<div class="workout-tags"><span class="tag tag-hr">🎯 ${entry.hr}</span></div>` : ''}
+
+        <div class="divider"></div>
+        <div class="log-section-title">Log This Workout</div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Morpheus Recovery %</label>
+            <input type="number" id="f-recovery" placeholder="e.g. 88" min="0" max="100">
+          </div>
+          <div class="field">
+            <label>Duration (min)</label>
+            <input type="number" id="f-duration" placeholder="e.g. 55">
+          </div>
+        </div>
+
+        ${isRide ? `
+        <div class="form-row">
+          <div class="field">
+            <label>Avg HR</label>
+            <input type="number" id="f-avghr" placeholder="e.g. 131">
+          </div>
+          <div class="field">
+            <label>Max HR</label>
+            <input type="number" id="f-maxhr" placeholder="e.g. 143">
+          </div>
+        </div>
+        <div class="form-row three">
+          <div class="field"><label>Time Z2</label><input type="text" id="f-z2" placeholder="e.g. 45m"></div>
+          <div class="field"><label>Time Z3</label><input type="text" id="f-z3" placeholder="e.g. 10m"></div>
+          <div class="field"><label>Time Z4+</label><input type="text" id="f-z4" placeholder="—"></div>
+        </div>
+        <div class="form-row single">
+          <div class="field">
+            <label>Calories (Morpheus)</label>
+            <input type="number" id="f-cals" placeholder="e.g. 580">
+          </div>
+        </div>
+        ` : ''}
+
+        <div class="field" style="margin-bottom:10px">
+          <label>RPE (1–10)</label>
+          <div class="rpe-track">
+            <input type="range" id="f-rpe" min="1" max="10" value="5" oninput="document.getElementById('rpe-display').textContent=this.value">
+            <span class="rpe-val" id="rpe-display">5</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Notes</label>
+          <textarea id="f-notes" placeholder="How did it feel? Anything to remember?"></textarea>
+        </div>
+
+        <button class="save-btn" onclick="saveEntry('${today}', ${isRide}, ${isStrength})">Save Workout ✓</button>
+        ${!isRest ? `<button class="skip-btn" onclick="skipEntry('${today}')">Mark as skipped</button>` : `<button class="skip-btn" onclick="markRest('${today}')">Mark rest day done</button>`}
+      </div>
+    </div>`;
+}
+
+async function saveEntry(dateStr, isRide, isStrength) {
+  const entry = {
+    status: 'logged',
+    recovery: document.getElementById('f-recovery')?.value || '',
+    duration: document.getElementById('f-duration')?.value || '',
+    rpe: document.getElementById('f-rpe')?.value || '',
+    notes: document.getElementById('f-notes')?.value || '',
+  };
+  if (isRide) {
+    entry.avgHr = document.getElementById('f-avghr')?.value || '';
+    entry.maxHr = document.getElementById('f-maxhr')?.value || '';
+    entry.z2 = document.getElementById('f-z2')?.value || '';
+    entry.z3 = document.getElementById('f-z3')?.value || '';
+    entry.z4 = document.getElementById('f-z4')?.value || '';
+    entry.cals = document.getElementById('f-cals')?.value || '';
+  }
+  log[dateStr] = entry;
+  showToast('Saving… 💪');
+  await saveLog(log);
+  showToast('Workout saved! 💪');
+  renderToday();
+}
+
+async function skipEntry(dateStr) {
+  log[dateStr] = { status: 'skipped' };
+  await saveLog(log);
+  showToast('Marked as skipped');
+  renderToday();
+}
+
+async function markRest(dateStr) {
+  log[dateStr] = { status: 'logged', notes: 'Rest day' };
+  await saveLog(log);
+  showToast('Rest day logged ✓');
+  renderToday();
+}
+
+async function clearLog(dateStr) {
+  await deleteEntry(dateStr);
+  renderToday();
+}
+
+// ── SCHEDULE TAB ──────────────────────────────────────────────────────
+
+function renderSchedule() {
+  const wrap = document.getElementById('scheduleWrap');
+  const today = todayStr();
+
+  // Group by week property
+  const weekMap = {};
+  PHASE1.forEach(entry => {
+    const key = entry.week === 'pre' ? '__pre' : `week_${entry.week}`;
+    if (!weekMap[key]) weekMap[key] = { week: entry.week, days: [] };
+    weekMap[key].days.push(entry);
+  });
+
+  const weeks = Object.values(weekMap).map(w => {
+    let label;
+    if (w.week === 'pre') label = 'Pre-Week (Apr 4–5)';
+    else {
+      const hasVancouver = w.days.some(d => d.notice === 'vancouver');
+      const hasDeload = w.days.some(d => d.notice === 'deload');
+      if (hasVancouver && w.week === 4) label = `Week ${w.week} · Pre-Vancouver + Travel`;
+      else if (hasVancouver) label = `Week ${w.week} · 🎵 Vancouver — Leonids Tour`;
+      else if (hasDeload) label = `Week ${w.week} · ↩️ Post-Tour Deload`;
+      else label = `Week ${w.week}`;
+    }
+    return { label, days: w.days };
+  });
+
+  wrap.innerHTML = weeks.map(week => `
+    <div class="week-section">
+      <div class="week-label">${week.label}</div>
+      <div class="week-grid">
+        ${week.days.map(entry => {
+          const logged = log[entry.date];
+          const isLogged = logged?.status === 'logged';
+          const isSkipped = logged?.status === 'skipped';
+          const isToday = entry.date === today;
+          const future = isFuture(entry.date);
+          const dc = dotClass(entry, entry.date, isLogged, isSkipped);
+          const icon = typeIcon(entry.type);
+          let rowClass = 'day-row';
+          if (isToday) rowClass += ' is-today';
+          else if (isLogged) rowClass += ' is-logged';
+          else if (isSkipped) rowClass += ' is-skipped';
+          else if (future) rowClass += ' is-future';
+
+          const logSummary = isLogged && logged.avgHr
+            ? `Avg HR ${logged.avgHr} · RPE ${logged.rpe}`
+            : isLogged ? 'Logged ✓' : isSkipped ? 'Skipped' : '';
+
+          return `<div class="${rowClass}" onclick="openDetail('${entry.date}')">
+            <div class="day-dot ${dc}">${isLogged ? '✓' : isSkipped ? '–' : icon}</div>
+            <div class="day-info">
+              <div class="di-date">${entry.day}, ${fmtDate(entry.date)}${isToday ? ' · Today' : ''}</div>
+              <div class="di-workout">${entry.label}</div>
+              ${logSummary ? `<div class="di-logged">${logSummary}</div>` : ''}
+            </div>
+            <div class="day-chevron">›</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── DETAIL SHEET ──────────────────────────────────────────────────────
+
+function openDetail(dateStr) {
+  const entry = PHASE1.find(e => e.date === dateStr);
+  if (!entry) return;
+  const logged = log[dateStr];
+  const today = todayStr();
+  const isToday = dateStr === today;
+  const future = isFuture(dateStr);
+  const icon = typeIcon(entry.type);
+
+  let logHtml = '';
+  if (logged?.status === 'logged') {
+    logHtml = `
+      <div style="background:var(--green-light);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+        <div style="font-weight:600;color:var(--green);margin-bottom:8px">✓ Logged</div>
+        ${logged.recovery ? `<div style="font-size:13px;color:var(--ink-soft);margin-bottom:4px">Recovery: ${logged.recovery}%</div>` : ''}
+        ${logged.duration ? `<div style="font-size:13px;color:var(--ink-soft);margin-bottom:4px">Duration: ${logged.duration} min</div>` : ''}
+        ${logged.avgHr ? `<div style="font-size:13px;color:var(--ink-soft);margin-bottom:4px">Avg HR: ${logged.avgHr} · Max: ${logged.maxHr||'—'}</div>` : ''}
+        ${logged.z2 ? `<div style="font-size:13px;color:var(--ink-soft);margin-bottom:4px">Z2: ${logged.z2} · Z3: ${logged.z3||'—'} · Z4+: ${logged.z4||'—'}</div>` : ''}
+        ${logged.rpe ? `<div style="font-size:13px;color:var(--ink-soft);margin-bottom:4px">RPE: ${logged.rpe}/10</div>` : ''}
+        ${logged.notes ? `<div style="font-size:13px;color:var(--ink-soft);margin-top:8px;font-style:italic">"${logged.notes}"</div>` : ''}
+      </div>
+      <button class="skip-btn" onclick="clearLog('${dateStr}');closeDetail();renderSchedule()">Edit / Clear entry</button>`;
+  } else if (logged?.status === 'skipped') {
+    logHtml = `<div style="background:var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px;color:var(--ink-muted);font-size:14px">Marked as skipped.</div>
+      <button class="skip-btn" onclick="clearLog('${dateStr}');closeDetail();renderSchedule()">Undo skip</button>`;
+  } else if (!future) {
+    logHtml = `<button class="save-btn" onclick="closeDetail();showTab('today')">Log Today's Workout</button>`;
+  } else {
+    logHtml = `<p style="font-size:13px;color:var(--ink-muted);text-align:center">Future session — check back on ${fmtDate(dateStr)}</p>`;
+  }
+
+  document.getElementById('detailContent').innerHTML = `
+    <div style="margin-bottom:20px">
+      <div style="font-size:12px;color:var(--ink-muted);margin-bottom:4px">${entry.day}, ${fmtDate(entry.date)} · ${entry.type}</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:10px">${icon} ${entry.label}</div>
+      <p style="font-size:14px;color:var(--ink-soft);line-height:1.6;margin-bottom:12px">${entry.desc}</p>
+      ${entry.hr ? `<div class="workout-tags"><span class="tag tag-hr">🎯 ${entry.hr}</span></div>` : ''}
+    </div>
+    <div class="divider"></div>
+    ${logHtml}
+  `;
+
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
+function closeDetail(e) {
+  if (!e || e.target === document.getElementById('detailOverlay')) {
+    document.getElementById('detailOverlay').classList.remove('open');
+  }
+}
+
+// ── STATS TAB ─────────────────────────────────────────────────────────
+
+function renderStats() {
+  const today = todayStr();
+  const pastDays = PHASE1.filter(e => e.date <= today);
+  const totalDays = PHASE1.length;
+  const logged = pastDays.filter(e => log[e.date]?.status === 'logged').length;
+  const skipped = pastDays.filter(e => log[e.date]?.status === 'skipped').length;
+  const rides = PHASE1.filter(e => ['ride','cardio'].some(x => e.type.toLowerCase().includes(x)));
+  const loggedRides = rides.filter(e => log[e.date]?.status === 'logged').length;
+  const pct = pastDays.length ? Math.round((logged / pastDays.length) * 100) : 0;
+  const daysDone = PHASE1.findIndex(e => e.date > today);
+  const daysLeft = totalDays - (daysDone === -1 ? totalDays : daysDone);
+
+  // Avg HR from logged rides
+  const rideData = rides.filter(e => log[e.date]?.avgHr);
+  const avgHrAll = rideData.length
+    ? Math.round(rideData.reduce((s,e) => s + Number(log[e.date].avgHr), 0) / rideData.length)
+    : null;
+
+  const wrap = document.getElementById('statsWrap');
+  wrap.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="sc-val">${logged}</div>
+        <div class="sc-label">Sessions logged</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-val">${pct}%</div>
+        <div class="sc-label">Completion rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-val">${loggedRides}</div>
+        <div class="sc-label">Rides completed</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-val">${daysLeft}</div>
+        <div class="sc-label">Days remaining</div>
+      </div>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="pb-label"><span>Phase 1 Progress</span><span>${logged} / ${totalDays} days</span></div>
+      <div class="pb-track"><div class="pb-fill" style="width:${Math.round((logged/totalDays)*100)}%"></div></div>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="pb-label"><span>Rides</span><span>${loggedRides} / ${rides.length}</span></div>
+      <div class="pb-track"><div class="pb-fill green" style="width:${rides.length ? Math.round((loggedRides/rides.length)*100) : 0}%"></div></div>
+    </div>
+
+    ${avgHrAll ? `
+    <div class="today-card" style="margin-top:10px">
+      <div class="today-card-body">
+        <div class="log-section-title">Ride Averages</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:36px;color:var(--accent)">${avgHrAll} <span style="font-size:18px;color:var(--ink-muted)">bpm avg</span></div>
+        <p style="font-size:13px;color:var(--ink-muted);margin-top:4px">Average HR across ${rideData.length} logged ride${rideData.length!==1?'s':''}</p>
+      </div>
+    </div>` : `
+    <div class="today-card" style="margin-top:10px">
+      <div class="today-card-body" style="text-align:center;padding:24px">
+        <p style="font-size:14px;color:var(--ink-muted)">Log some rides to see your HR trends here.</p>
+      </div>
+    </div>`}
+
+    ${skipped > 0 ? `<p style="font-size:12px;color:var(--ink-muted);text-align:center;margin-top:12px">${skipped} session${skipped!==1?'s':''} skipped — that's okay.</p>` : ''}
+  `;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+
+initLog();
+</script>
+</body>
+</html>
