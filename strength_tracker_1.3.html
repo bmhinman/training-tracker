@@ -520,7 +520,7 @@ const SESSIONS = {
 
 // ── STORAGE & SYNC ────────────────────────────────────────────────────
 
-const API_URL = 'https://script.google.com/macros/s/AKfycbzCrhXhlQnGnWJZ_QHCAPLYoSW-4h-3fVamS-XOZzOMITOzjqhRhosvLTZF8D0Io9o4CQ/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyN2O6PdFqG8r5A8cpuQL5_IZEUwsrxSh-L2NVUvuyk1nsbCvnaTmYHpXfUJ98o9qTrFA/exec';
 const STORAGE_KEY = 'strength_log_v1';
 let strengthLog = {};
 
@@ -551,10 +551,17 @@ function normalizeLog(rawLog) {
 function initLog() {
   try {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    console.log('Raw localStorage data:', JSON.stringify(raw));
-    strengthLog = normalizeLog(raw);
-    console.log('Normalized log keys:', Object.keys(strengthLog));
-    console.log('Normalized log:', JSON.stringify(strengthLog));
+    // Only keep entries that look like strength data (have a 'session' field or 'exercises' field)
+    // This prevents cycling app data bleeding in via shared localStorage
+    const strengthOnly = {};
+    for (const key in raw) {
+      const entry = raw[key];
+      if (entry && (entry.session || entry.exercises)) {
+        strengthOnly[key] = entry;
+      }
+    }
+    strengthLog = normalizeLog(strengthOnly);
+    console.log('Strength log loaded:', Object.keys(strengthLog));
   } catch { strengthLog = {}; }
   renderWorkout();
   fetchFromSheets();
@@ -563,7 +570,8 @@ function initLog() {
 async function fetchFromSheets() {
   if (API_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
   try {
-    const res = await fetch(API_URL + '?action=getAll');
+    // Pass appId=strength so Apps Script returns only strength data
+    const res = await fetch(API_URL + '?action=getAll&appId=strength');
     const data = await res.json();
     if (data && data.log) {
       strengthLog = normalizeLog(data.log);
@@ -582,9 +590,10 @@ async function saveLog() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(clean));
   if (API_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
   try {
+    // Pass appId=strength so Apps Script namespaces this data separately
     await fetch(API_URL, {
       method: 'POST',
-      body: JSON.stringify({ action: 'saveAll', log: clean })
+      body: JSON.stringify({ action: 'saveAll', appId: 'strength', log: clean })
     });
   } catch(e) {}
 }
