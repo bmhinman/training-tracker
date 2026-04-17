@@ -520,7 +520,7 @@ const SESSIONS = {
 
 // ── STORAGE & SYNC ────────────────────────────────────────────────────
 
-const API_URL = 'https://script.google.com/macros/s/AKfycbyN2O6PdFqG8r5A8cpuQL5_IZEUwsrxSh-L2NVUvuyk1nsbCvnaTmYHpXfUJ98o9qTrFA/exec';
+const API_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
 const STORAGE_KEY = 'strength_log_v1';
 let strengthLog = {};
 
@@ -788,10 +788,13 @@ function renderWorkout() {
 
   wrap.innerHTML = html;
 
-  // Scroll current exercise into view
+  // Scroll current exercise into view with breathing room above the card
   setTimeout(() => {
     const el = document.getElementById(`ex-${currentExIdx}`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - 90;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
   }, 100);
 }
 
